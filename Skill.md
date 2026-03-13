@@ -1,31 +1,30 @@
 ---
 name: cc-codex-flow
- description: Claude Code + Codex collaborative development workflow with GLM support and proxy support
- triggers:
-   - cc codex
-   - codex collaboration
-   - collaborative coding
- argument-hint: "[task description]"
+description: Claude Code + Codex collaborative development workflow with GLM support and proxy support
+triggers:
+  - cc codex
+  - codex collaboration
+  - collaborative coding
+argument-hint: "[task description]"
 ---
 
 # CC + Codex Collaborative Development Skill
 
 ## Purpose
 
-This skill orchestrates collaborative development between Claude Code (using GLM, and Codex (using OpenAI API with proxy). maximizing the strengths of both tool.
+This skill orchestrates collaborative development between Claude Code (using GLM) and Codex (using OpenAI API with proxy), maximizing the strengths of both tools.
 
 ## When to activate
 
 - User mentions "cc codex", "codex collaboration", or "collaborative coding"
 - User wants to use both Claude Code and Codex together for development
-
 - Complex development tasks requiring code generation and refactoring
 
 ## Environment Requirements
 
 ### Claude Code Environment
 - Uses GLM model (requires direct connection, no proxy)
-- Plan mode: uses oh-my-claudecode's `/plan` or `/ralplan`
+- Plan mode: uses this skill's built-in planning workflow
 
 ### Codex Environment
 - Requires proxy access to OpenAI API
@@ -39,10 +38,9 @@ This skill orchestrates collaborative development between Claude Code (using GLM
 - Glob/Grep: analyze code structure
 - Output: context report (tech stack, files, patterns, risks)
 
-### Phase 2: Task Planning (oh-my-claudecode Plan Mode)
-Use `/oh-my-claudecode:plan` or `/ralplan` for planning:
+### Phase 2: Task Planning (Built-in Planning)
+Create a tech spec using this template:
 
-**Tech Spec Template:**
 ```markdown
 ## Tech Spec
 Goal: [one sentence]
@@ -55,18 +53,13 @@ Compatibility: [how to ensure]
 - [ ] Task 2: ...
 ```
 
-**Plan Mode Note**: Use `/oh-my-claudecode:plan` instead of built-in Plan Mode (Shift+Tab), because:
-- CC uses GLM which requires direct connection
-- oh-my-claudecode's plan skill works with GLM
-- The plan skill can handle the planning workflow
-
 ### Phase 3: Execution (Codex-First)
 All code-related tasks are delegated to Codex via MCP:
 
 **Codex MCP Call Example:**
 ```javascript
 mcp__codex__codex({
-  model: "o3",
+  model: "gpt-5.4",
   sandbox: "danger-full-access",
   approval-policy: "on-failure",
   prompt: "<structured prompt>"
@@ -74,13 +67,13 @@ mcp__codex__codex({
 ```
 
 **Session Management:**
-- Save `conversationId` from first call
-- Use `mcp__codex__codex_reply` for subsequent calls
+- Save `threadId` from first call
+- Use `mcp__codex__codex-reply` for subsequent calls
 
 **CRITICAL Requirements for Codex MCP calls:**
-- `model`: "o3"` (or user's preferred model)
-- `sandbox`: "danger-full-access"`
-- `approval-policy: "on-failure"`
+- `model`: "gpt-5.4"` (or your preferred model from config)
+- `sandbox`: "danger-full-access"
+- `approval-policy`: "on-failure" (or "on-request" for interactive)
 
 ### Phase 4: Validation (Claude Code)
 - [ ] Functionality ✓
@@ -95,7 +88,7 @@ mcp__codex__codex({
 ## Decision Flow
 
 ```
-User Request → /plan (oh-my-claudecode) → Assess → Default to Codex for code → Only CC for trivial/non-code
+User Request → Analyze → Plan → Default to Codex for code → Only CC for trivial/non-code
 ```
 
 ## MCP Configuration
@@ -107,7 +100,7 @@ The Codex MCP is configured in `~/.claude.json` with proxy settings:
     "codex": {
       "type": "stdio",
       "command": "codex",
-      "args": ["mcp", "serve"],
+      "args": ["mcp-server"],
       "env": {
         "HTTP_PROXY": "http://127.0.0.1:7897",
         "HTTPS_PROXY": "http://127.0.0.1:7897",
@@ -118,9 +111,7 @@ The Codex MCP is configured in `~/.claude.json` with proxy settings:
 }
 ```
 
-## Collaboration Rules (Embedded in this skill)
-
-This skill embeds collaboration rules directly, so it doesn't depend on system-level CLAUDE.md
+## Collaboration Rules
 
 ### Core Principles
 1. **Separation of concerns**: CC = brain (planning, search, decisions), Codex = hands (code generation, refactoring)
@@ -128,7 +119,7 @@ This skill embeds collaboration rules directly, so it doesn't depend on system-l
 3. **Zero-confirmation flow**: Pre-defined boundaries, auto-execute within limits
 
 ### CC Responsibilities
-- Plan, search (WebSearch/Glob/grep), decide, coordinate Codex
+- Plan, search (WebSearch/Glob/Grep), decide, coordinate Codex
 - Trivial changes only: typo fixes, comment updates, simple config tweaks (<20 lines)
 - No final code in planning phase
 - Delegate all code generation/refactoring to Codex
@@ -178,7 +169,7 @@ Maximize Codex involvement for all code-related tasks
 
 ### Complex Task
 ```
-/cc-codex-flow Implement user authentication with JWT tokens and including login, registration, password reset, and profile management
+/cc-codex-flow Implement user authentication with JWT tokens, including login, registration, password reset, and profile management
 ```
 
 ### Refactoring Task
@@ -189,5 +180,5 @@ Maximize Codex involvement for all code-related tasks
 ## Notes
 - Codex MCP requires proxy configured in ~/.claude.json
 - Claude Code uses GLM direct connection
-- Plan mode uses oh-my-claudecode's /plan or or `/ralplan`
-- This skill is self-contained and doesn't modify system-level CLAUDE.md
+- This skill is self-contained and doesn't depend on oh-my-claudecode
+- Model should be "gpt-5.4" based on your codex config
