@@ -1,7 +1,7 @@
 {
   "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"gh repo create cc-codex-workflow --public --source=. --remote=origin --push -u origin main\",\"timeout\":60000,\"description\":\"Create GitHub repo and push\"}",
-  "error": "Exit code 1\nunknown shorthand flag: 'u' in -u\n\nUsage:  gh repo create [<name>] [flags]\n\nFlags:\n      --add-readme             Add a README file to the new repository\n  -c, --clone                  Clone the new repository to the current directory\n  -d, --description string     Description of the repository\n      --disable-issues         Disable issues in the new repository\n      --disable-wiki           Disable wiki in the new repository\n  -g, --gitignore string       Specify a gitignore templat...",
-  "timestamp": "2026-03-13T13:41:50.775Z",
+  "tool_input_preview": "{\"command\":\"git push\",\"description\":\"Push updates to GitHub\"}",
+  "error": "Exit code 128\nfatal: unable to access 'https://github.com/ForeverHYX/cc-codex-workflow.git/': Error in the HTTP2 framing layer",
+  "timestamp": "2026-03-13T14:00:05.551Z",
   "retry_count": 1
 }

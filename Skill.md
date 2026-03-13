@@ -1,99 +1,39 @@
 ---
 name: cc-codex-flow
-description: Claude Code + Codex collaborative development workflow with GLM support and proxy support
-triggers:
-  - cc codex
-  - codex collaboration
-  - collaborative coding
-argument-hint: "[task description]"
+description: Collaborative development workflow using Claude Code and Codex together. Use this skill when the user wants to leverage both Claude Code (for planning, search, architecture) and Codex (for code generation, refactoring, bug fixes) in a coordinated workflow. Triggers on phrases like "cc codex", "codex collaboration", "collaborative coding", or when complex development tasks would benefit from dual-AI orchestration.
+license: MIT
 ---
 
-# CC + Codex Collaborative Development Skill
+# CC + Codex Collaborative Development
+
+Orchestrate Claude Code (GLM) and Codex (OpenAI) working together for superior development outcomes.
 
 ## Purpose
 
-This skill orchestrates collaborative development between Claude Code (using GLM) and Codex (using OpenAI API with proxy), maximizing the strengths of both tools.
+This skill coordinates two AI systems:
+- **Claude Code (GLM)**: Planning, code search, architecture decisions, validation
+- **Codex (OpenAI)**: Code generation, refactoring, implementation, bug fixes
 
-## When to activate
+The workflow maximizes each AI's strengths while compensating for their limitations.
 
-- User mentions "cc codex", "codex collaboration", or "collaborative coding"
-- User wants to use both Claude Code and Codex together for development
-- Complex development tasks requiring code generation and refactoring
+## When to Activate
 
-## Environment Requirements
+- User explicitly mentions collaborative coding between Claude Code and Codex
+- Complex tasks requiring both planning and heavy code generation
+- Refactoring or implementation tasks where dual verification adds value
+- User asks for "cc codex" or similar phrases
+
+## Environment Configuration
 
 ### Claude Code Environment
-- Uses GLM model (requires direct connection, no proxy)
-- Plan mode: uses this skill's built-in planning workflow
+- Model: GLM (direct connection, no proxy required)
+- Role: Orchestrator, planner, validator
 
 ### Codex Environment
-- Requires proxy access to OpenAI API
-- Proxy: http://127.0.0.1:7897
-- Configured in ~/.claude.json via MCP server env
+- Model: gpt-5.4 (configured in ~/.codex/config.toml)
+- Proxy: Required for OpenAI API access (port 7897)
+- MCP Configuration in `~/.claude.json`:
 
-## Workflow
-
-### Phase 1: Information Collection (Claude Code)
-- WebSearch: latest docs/practices
-- Glob/Grep: analyze code structure
-- Output: context report (tech stack, files, patterns, risks)
-
-### Phase 2: Task Planning (Built-in Planning)
-Create a tech spec using this template:
-
-```markdown
-## Tech Spec
-Goal: [one sentence]
-Tech: [lang/framework]
-Risks: [breaking changes]
-Compatibility: [how to ensure]
-
-## Tasks
-- [ ] Task 1: [desc] | Executor: CC/Codex | Files: [paths] | Constraints: [limits] | Acceptance: [criteria]
-- [ ] Task 2: ...
-```
-
-### Phase 3: Execution (Codex-First)
-All code-related tasks are delegated to Codex via MCP:
-
-**Codex MCP Call Example:**
-```javascript
-mcp__codex__codex({
-  model: "gpt-5.4",
-  sandbox: "danger-full-access",
-  approval-policy: "on-failure",
-  prompt: "<structured prompt>"
-})
-```
-
-**Session Management:**
-- Save `threadId` from first call
-- Use `mcp__codex__codex-reply` for subsequent calls
-
-**CRITICAL Requirements for Codex MCP calls:**
-- `model`: "gpt-5.4"` (or your preferred model from config)
-- `sandbox`: "danger-full-access"
-- `approval-policy`: "on-failure" (or "on-request" for interactive)
-
-### Phase 4: Validation (Claude Code)
-- [ ] Functionality ✓
-- [ ] Tests ✓
-- [ ] Types ✓
-- [ ] Performance ✓
-- [ ] No API break ✓
-- [ ] Style ✓
-
-- If issues, return to Phase 3
-
-## Decision Flow
-
-```
-User Request → Analyze → Plan → Default to Codex for code → Only CC for trivial/non-code
-```
-
-## MCP Configuration
-
-The Codex MCP is configured in `~/.claude.json` with proxy settings:
 ```json
 {
   "mcpServers": {
@@ -111,74 +51,144 @@ The Codex MCP is configured in `~/.claude.json` with proxy settings:
 }
 ```
 
-## Collaboration Rules
+## Workflow
 
-### Core Principles
-1. **Separation of concerns**: CC = brain (planning, search, decisions), Codex = hands (code generation, refactoring)
-2. **Codex-First strategy**: Default to Codex for code tasks, CC only for trivial changes (<20 lines) and non-code work
-3. **Zero-confirmation flow**: Pre-defined boundaries, auto-execute within limits
+### Phase 1: Information Collection (Claude Code)
 
-### CC Responsibilities
-- Plan, search (WebSearch/Glob/Grep), decide, coordinate Codex
-- Trivial changes only: typo fixes, comment updates, simple config tweaks (<20 lines)
-- No final code in planning phase
-- Delegate all code generation/refactoring to Codex
+Gather context using available tools:
+- WebSearch: Latest documentation and best practices
+- Glob/Grep: Analyze existing code structure
+- Read: Understand current implementation
 
-### Codex Participation Priority
-Maximize Codex involvement for all code-related tasks
-- Single function modification → Codex
-- Adding a new method → Codex
-- Refactoring logic → Codex
-- Bug fixes → Codex
-- Only skip Codex for: typo fixes, comment-only changes, trivial config tweaks (<20 lines)
+Output: Context report covering tech stack, relevant files, patterns, and potential risks.
+
+### Phase 2: Task Planning
+
+Create a structured plan using this template:
+
+```markdown
+## Tech Spec
+Goal: [Single sentence objective]
+Tech: [Language/framework/libraries]
+Risks: [Potential breaking changes]
+Compatibility: [How to preserve existing behavior]
+
+## Tasks
+- [ ] Task 1: [Description]
+  - Executor: Codex
+  - Files: [Paths]
+  - Constraints: [Limitations]
+  - Acceptance: [Verification criteria]
+```
+
+### Phase 3: Execution (Codex-First)
+
+Delegate code tasks to Codex via MCP:
+
+```
+mcp__codex__codex({
+  "model": "gpt-5.4",
+  "sandbox": "danger-full-access",
+  "approval-policy": "on-failure",
+  "prompt": "<structured prompt with context, task, constraints, acceptance criteria>"
+})
+```
+
+**Session Management:**
+- Capture `threadId` from the response
+- Use `mcp__codex__codex-reply` for follow-up messages:
+  ```
+  mcp__codex__codex-reply({
+    "threadId": "<saved-thread-id>",
+    "prompt": "<next instruction>"
+  })
+  ```
+
+### Phase 4: Validation (Claude Code)
+
+Verify the implementation:
+- [ ] Functionality works as expected
+- [ ] Tests pass (if applicable)
+- [ ] No type errors
+- [ ] Performance acceptable
+- [ ] No API breakage
+- [ ] Code style consistent
+
+If issues found, return to Phase 3 with specific fixes.
 
 ## Routing Matrix
 
-| Task | Executor | Trigger | Reason |
-|------|----------|---------|--------|
-| Code changes | **Codex** | Any code modification | Strong generation |
-| Single-file edit | **Codex** | Even <50 lines if involves logic/code | Better code understanding |
-| Multi-file refactor | **Codex** | >1 file with code changes | Global understanding |
-| New feature | **Codex** | Any new functionality | Strong generation |
-| Bug fix | **Codex** | Need trace or logic fix | Strong search + fix |
-| Trivial changes | **CC** | Typos, comments, simple configs (<20 lines) | Too simple for Codex |
-| Non-code work | **CC** | Pure .md/.json/.yaml (no logic) | No code generation needed |
-| Architecture | **CC** | Pure design decision | Planning strength |
+| Task Type | Executor | Rationale |
+|-----------|----------|-----------|
+| Code changes | Codex | Strong code generation |
+| New features | Codex | Better implementation quality |
+| Bug fixes | Codex | Better code understanding |
+| Refactoring | Codex | Global code comprehension |
+| Architecture | Claude Code | Planning strength |
+| Documentation | Claude Code | No code generation needed |
+| Trivial edits (<20 lines) | Claude Code | Too simple for Codex overhead |
+
+## Codex Prompt Template
+
+When calling Codex, use this structure:
+
+```markdown
+## Context
+- Tech Stack: [language/framework/version]
+- Files: [path]: [purpose]
+- Reference: [file for pattern/style]
+
+## Task
+[Clear, specific, verifiable task]
+
+Steps:
+1. [First step]
+2. [Second step]
+3. [Third step]
+
+## Constraints
+- API: Don't change [signatures]
+- Performance: [requirements]
+- Style: Follow [reference file]
+- Scope: Only modify [specified files]
+- Dependencies: No new deps without approval
+
+## Acceptance Criteria
+- [ ] Tests pass
+- [ ] Types compile
+- [ ] Linter clean
+- [ ] [Project-specific criteria]
+```
+
+## Anti-Patterns
+
+| Pattern | Problem | Solution |
+|---------|---------|----------|
+| Claude Code writing code | Wastes Codex strength | Delegate to Codex |
+| Vague Codex prompts | Poor output quality | Use structured template |
+| Skipping validation | Hidden bugs | Always run Phase 4 |
+| Missing threadId | Lost context | Save and reuse threadId |
+| Ignoring constraints | Breaks existing code | Document all constraints |
 
 ## Success Metrics
-- **Efficiency**: 90% auto (no manual confirm) | <2min avg cycle | >80% first-time success
-- **Quality**: Zero API break | Test coverage maintained | No performance regression
-- **Experience**: Clear breakdown | Transparent progress | Recoverable errors
 
-## Anti-Patterns (AVOID)
-| Pattern | Problem | Fix |
-|---------|---------|-----|
-| CC doing code work | Waste Codex's strength | Use Codex for all code changes (even simple) |
-| No boundaries | High failure, breaks code | Structured prompt required |
-| Confirmation loops | Low efficiency | Pre-define auto boundaries |
-| Ignoring Codex for "simple" edits | Miss code quality improvements | Default to Codex unless trivial (<20 lines typo/comment) |
-| Vague tasks | Codex can't understand | Specific, measurable, verifiable |
-| Ignore compatibility | Break user code | Explain in Constraints |
+- **Efficiency**: >80% first-time success rate
+- **Quality**: Zero API breakage, maintained test coverage
+- **Speed**: <5 min average task completion
 
 ## Examples
 
 ### Simple Task
 ```
-/cc-codex-flow Add a helper function to validate email addresses
+/cc-codex-flow Add email validation to the user registration form
 ```
 
 ### Complex Task
 ```
-/cc-codex-flow Implement user authentication with JWT tokens, including login, registration, password reset, and profile management
+/cc-codex-flow Implement user authentication with JWT, including login, registration, password reset, and session management
 ```
 
 ### Refactoring Task
 ```
-/cc-codex-flow Refactor the data processing module to use the functional pipeline pattern for better testability
+/cc-codex-flow Refactor the payment processing module to use the strategy pattern for multiple payment providers
 ```
-
-## Notes
-- Codex MCP requires proxy configured in ~/.claude.json
-- Claude Code uses GLM direct connection
-- This skill is self-contained and doesn't depend on oh-my-claudecode
-- Model should be "gpt-5.4" based on your codex config
