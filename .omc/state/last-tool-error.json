@@ -1,7 +1,0 @@
-{
-  "tool_name": "Bash",
-  "tool_input_preview": "{\"command\":\"git push\",\"description\":\"Push updates to GitHub\"}",
-  "error": "Exit code 128\nfatal: unable to access 'https://github.com/ForeverHYX/cc-codex-workflow.git/': Error in the HTTP2 framing layer",
-  "timestamp": "2026-03-13T14:00:05.551Z",
-  "retry_count": 1
-}

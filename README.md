@@ -6,7 +6,6 @@ A workflow for collaborative development using Claude Code and Codex (OpenAI API
 
 - **Dual-Model collaboration**: Claude Code handles planning/search, Codex handles code generation
 - **Proxy support**: Automatic proxy configuration for Codex through port 7897
-- **Plan mode integration**: Uses oh-my-claudecode's `/plan` or `/ralplan`
 - **Self-contained**: No modification to system-level CLAUDE.md required
 
 ## Quick Start
@@ -85,8 +84,7 @@ Examples:
    - Glob/Grep for code structure analysis
    - Output: context report
 
-2. **Task Planning** (oh-my-claudecode Plan Mode)
-   - Use `/oh-my-claudecode:plan` or `/ralplan`
+2. **Task Planning** (Plan Mode)
    - Generate tech spec and task breakdown
 
 3. **Execution** (Codex-First)
