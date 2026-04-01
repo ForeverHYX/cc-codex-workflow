@@ -12,7 +12,7 @@ set -euo pipefail
 
 SKILL_NAME="cc-codex-flow"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SKILL_SRC="$SCRIPT_DIR/Skill.md"
+SKILL_SRC="$SCRIPT_DIR/SKILL.md"
 
 CLAUDE_SKILLS_DIR="$HOME/.claude/skills"
 SKILL_DEST="$CLAUDE_SKILLS_DIR/$SKILL_NAME"

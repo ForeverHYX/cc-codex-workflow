@@ -6,13 +6,13 @@ license: MIT
 
 # CC + Codex Collaborative Development
 
-Orchestrate Claude Code (GLM) and Codex (OpenAI) working together for superior development outcomes.
+Orchestrate Claude Code and Codex working together for superior development outcomes.
 
 ## Purpose
 
 This skill coordinates two AI systems:
-- **Claude Code (GLM)**: Planning, code search, architecture decisions, validation
-- **Codex (OpenAI)**: Code generation, refactoring, implementation, bug fixes
+- **Claude Code**: Planning, code search, architecture decisions, validation
+- **Codex**: Code generation, refactoring, implementation, bug fixes
 
 The workflow maximizes each AI's strengths while compensating for their limitations.
 
@@ -26,12 +26,11 @@ The workflow maximizes each AI's strengths while compensating for their limitati
 ## Environment Configuration
 
 ### Claude Code Environment
-- Model: GLM (direct connection, no proxy required)
 - Role: Orchestrator, planner, validator
 
 ### Codex Environment
-- Model: gpt-5.4 (configured in ~/.codex/config.toml)
-- Proxy: Required for OpenAI API access (port 7897)
+- Model: Configured in ~/.codex/config.toml
+- Proxy: Required for OpenAI API access (configure during installation)
 - MCP Configuration in `~/.claude.json`:
 
 ```json
@@ -87,7 +86,6 @@ Delegate code tasks to Codex via MCP:
 
 ```
 mcp__codex__codex({
-  "model": "gpt-5.4",
   "sandbox": "danger-full-access",
   "approval-policy": "on-failure",
   "prompt": "<structured prompt with context, task, constraints, acceptance criteria>"

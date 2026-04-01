@@ -59,7 +59,7 @@ To uninstall:
 2. **Copy the skill**:
 ```bash
 mkdir -p ~/.claude/skills/cc-codex-flow
-cp Skill.md ~/.claude/skills/cc-codex-flow/SKILL.md
+cp SKILL.md ~/.claude/skills/cc-codex-flow/SKILL.md
 ```
 
 3. **Restart Claude Code** to apply changes
