@@ -19,6 +19,25 @@ A workflow for collaborative development using Claude Code (GLM) and Codex (Open
 
 ### Installation
 
+#### Option 1: Auto Install (Recommended)
+
+```bash
+git clone https://github.com/your-username/cc-codex-workflow.git
+cd cc-codex-workflow
+./install.sh
+```
+
+The installer will:
+1. Copy the skill to `~/.claude/skills/cc-codex-flow/SKILL.md`
+2. Optionally configure Codex MCP in `~/.claude.json` (with proxy)
+
+To uninstall:
+```bash
+./install.sh --uninstall
+```
+
+#### Option 2: Manual Install
+
 1. **Configure Codex MCP** in `~/.claude.json`:
 ```json
 {
@@ -26,7 +45,7 @@ A workflow for collaborative development using Claude Code (GLM) and Codex (Open
     "codex": {
       "type": "stdio",
       "command": "codex",
-      "args": ["mcp", "serve"],
+      "args": ["mcp-server"],
       "env": {
         "HTTP_PROXY": "http://127.0.0.1:7897",
         "HTTPS_PROXY": "http://127.0.0.1:7897",
@@ -37,11 +56,10 @@ A workflow for collaborative development using Claude Code (GLM) and Codex (Open
 }
 ```
 
-2. **Install this skill**:
+2. **Copy the skill**:
 ```bash
-# Copy the skill directory to your local skills folder
-mkdir -p ~/.claude/skills/omc-learned/cc-codex-flow
-cp SKILL.md ~/.claude/skills/omc-learned/cc-codex-flow/
+mkdir -p ~/.claude/skills/cc-codex-flow
+cp Skill.md ~/.claude/skills/cc-codex-flow/SKILL.md
 ```
 
 3. **Restart Claude Code** to apply changes
