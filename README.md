@@ -1,10 +1,10 @@
 # CC + Codex Collaborative Development Workflow
 
-A workflow for collaborative development using Claude Code (GLM) and Codex (OpenAI API with proxy support).
+A workflow for collaborative development using Claude Code and Codex (OpenAI API with proxy support).
 
 ## Features
 
-- **Dual-AModel collaboration**: Claude Code handles planning/search, Codex handles code generation
+- **Dual-Model collaboration**: Claude Code handles planning/search, Codex handles code generation
 - **Proxy support**: Automatic proxy configuration for Codex through port 7897
 - **Plan mode integration**: Uses oh-my-claudecode's `/plan` or `/ralplan`
 - **Self-contained**: No modification to system-level CLAUDE.md required
@@ -13,7 +13,7 @@ A workflow for collaborative development using Claude Code (GLM) and Codex (Open
 
 ### Prerequisites
 
-1. **Claude Code** with GLM model access
+1. **Claude Code** installed
 2. **Codex CLI** installed: `npm install -g @openai/codex`
 3. **Proxy server** running on port 7897
 
